@@ -12,6 +12,9 @@ import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import {fakeBackendProvider} from "./interceptors/faked-backend.interceptor";
 import {ErrorInterceptor} from "./interceptors/error.interceptor";
 import {JwtInterceptor} from "./interceptors/jwt.interceptor";
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {MatSliderModule} from "@angular/material/slider";
+import {MatTabsModule} from "@angular/material/tabs";
 
 export class WebpackTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {
@@ -36,7 +39,10 @@ export class WebpackTranslateLoader implements TranslateLoader {
     }),
     AppRoutingModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    BrowserAnimationsModule,
+    MatSliderModule,
+    MatTabsModule
   ],
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},

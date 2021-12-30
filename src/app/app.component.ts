@@ -8,10 +8,11 @@ import {User} from "./models/user";
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+  activeLink = 'Home'
+  links = ["/", "/users"]
   constructor(
     private userService: UserService
   ) {
-    console.log("works")
   }
 
   get user(): User | undefined {
