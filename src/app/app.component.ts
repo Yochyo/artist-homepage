@@ -8,11 +8,16 @@ import {User} from "./models/user";
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  activeLink = 'Home'
-  links = ["/", "/users"]
-  constructor(
-    private userService: UserService
-  ) {
+  links = [{
+    path: "/measurements",
+    label: "Measurements"
+  },
+    {
+      path: "/measurements/add",
+      label: "Send to other device"
+    }]
+
+  constructor(private userService: UserService) {
   }
 
   get user(): User | undefined {

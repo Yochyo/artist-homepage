@@ -1,43 +1,18 @@
-<div class="card">
-  <h4 class="card-header">Register</h4>
-  <div class="card-body">
-    <form [formGroup]="_form" (ngSubmit)="onSubmit()">
-      <div class="form-group">
-        <label for="firstName">First Name</label>
-        <input type="text" formControlName="firstName" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.firstName.errors }" />
-        <div *ngIf="submitted && form.controls.firstName.errors" class="invalid-feedback">
-          <div *ngIf="form.controls.firstName.errors.required">First Name is required</div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="lastName">Last Name</label>
-        <input type="text" formControlName="lastName" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.lastName.errors }" />
-        <div *ngIf="submitted && form.controls.lastName.errors" class="invalid-feedback">
-          <div *ngIf="form.controls.lastName.errors.required">Last Name is required</div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" formControlName="username" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.username.errors }" />
-        <div *ngIf="submitted && form.controls.username.errors" class="invalid-feedback">
-          <div *ngIf="form.controls.username.errors.required">Username is required</div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" formControlName="password" class="form-control" [ngClass]="{ 'is-invalid': submitted && form.controls.password.errors }" />
-        <div *ngIf="submitted && form.controls.password.errors" class="invalid-feedback">
-          <div *ngIf="form.controls.password.errors.required">Password is required</div>
-          <div *ngIf="form.controls.password.errors.minlength">Password must be at least 6 characters</div>
-        </div>
-      </div>
-      <div class="form-group">
-        <button [disabled]="loading" class="btn btn-primary">
-          <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
-          Register
-        </button>
-        <a routerLink="../login" class="btn btn-link">Cancel</a>
-      </div>
-    </form>
-  </div>
+<div style="display: flex; justify-content: center; align-items: center; height: 80vh">
+  <mat-card style="display: flex; flex-direction: column; width: 400px">
+    <div style="display: flex; flex-direction: row">
+      <mat-card-title style="flex: 1">Register</mat-card-title>
+      <a (click)="loadLogin()">Login</a>
+    </div>
+    <mat-form-field appearance="legacy">
+      <mat-label>Username</mat-label>
+      <input matInput placeholder="Username" type="text" [formControl]="$any(form.controls.username)">
+    </mat-form-field>
+    <mat-form-field appearance="legacy">
+      <mat-label>Password</mat-label>
+      <input matInput placeholder="Password" type="password" [formControl]="$any(form.controls.password)">
+    </mat-form-field>
+
+    <button mat-flat-button color="primary" (click)="onSubmit()" [disabled]="!form.valid">Register</button>
+  </mat-card>
 </div>

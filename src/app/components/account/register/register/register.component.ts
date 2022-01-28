@@ -1,19 +1,16 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {first} from 'rxjs/operators';
+import {first, switchMap} from 'rxjs/operators';
 import {UserService} from "../../../../services/user.service";
-import {AlertService} from "../../../../services/alert.service";
 import {User} from "../../../../models/user";
 
-@Component({templateUrl: 'register.component.html'})
+@Component({selector: "", templateUrl: 'register.component.html', styleUrls: ['register.component.scss']})
 export class RegisterComponent implements OnInit {
   form = new FormGroup({
-    firstName: new FormControl('', Validators.required),
-    lastName: new FormControl('', Validators.required),
     username: new FormControl('', Validators.required),
     password: new FormControl('', [Validators.required, Validators.minLength(6)]),
-  }) as FormGroupTyped<Pick<User, 'firstName' | 'lastName' | 'username' | 'password'>>;
+  }) as FormGroupTyped<Pick<User, 'username' | 'password'>>;
   _form = this.form as FormGroup
   loading = false;
   submitted = false;
@@ -21,8 +18,7 @@ export class RegisterComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private accountService: UserService,
-    private alertService: AlertService
+    private userService: UserService,
   ) {
   }
 
@@ -30,28 +26,21 @@ export class RegisterComponent implements OnInit {
   }
 
   onSubmit() {
-    this.submitted = true;
-
-    // reset alerts on submit
-    this.alertService.clear();
-
     // stop here if form is invalid
     if (this.form.invalid) {
       return;
     }
 
-    this.loading = true;
-    this.accountService.register(this.form.value)
-      .pipe(first())
+    this.userService.register({username: this.form.value.username, password: this.form.value.password})
       .subscribe({
-        next: () => {
-          this.alertService.success('Registration successful', {keepAfterRouteChange: true});
-          this.router.navigate(['../login'], {relativeTo: this.route});
+        next: user => {
+          console.log({user: user})
+          // get return url from query parameters or default to home page
+          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+          this.router.navigateByUrl(returnUrl);
         },
-        error: error => {
-          this.alertService.error(error);
-          this.loading = false;
-        }
       });
   }
+
+  loadLogin = () => this.router.navigate(['/account/login'], {queryParams: {returnUrl: this.route.snapshot.queryParams['returnUrl'] || '/'}})
 }

@@ -1,0 +1,25 @@
+<div [formGroup]="$any(form)" style="padding: 64px;display: flex; justify-content: center; align-items: center">
+  <div style="width: 70%;display: flex; flex-direction: column">
+    <mat-radio-group aria-label="Gender" [formControl]="$any(form.controls.gender)">
+      <mat-radio-button value="male">male</mat-radio-button>
+      <mat-radio-button value="female">female</mat-radio-button>
+    </mat-radio-group>
+    <br>
+    <mat-form-field appearance="legacy">
+      <mat-label>Age (months)</mat-label>
+      <input matInput placeholder="Age (months)" type="number" [formControl]="$any(form.controls.age)">
+    </mat-form-field>
+    <mat-form-field appearance="legacy">
+      <mat-label>Weight (kg)</mat-label>
+      <input matInput placeholder="Weight (kg)" type="number" [formControl]="$any(form.controls.weight)">
+    </mat-form-field>
+    <mat-form-field appearance="legacy">
+      <mat-label>Height (cm)</mat-label>
+      <input matInput placeholder="Height (cm)" type="number" [formControl]="$any(form.controls.height)">
+    </mat-form-field>
+
+    <button mat-flat-button color="primary" (click)="check()" [disabled]="!form.valid">Login</button>
+
+    <h3>{{result + ""}}</h3>
+  </div>
+</div>

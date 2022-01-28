@@ -1,42 +1,34 @@
 import {Injectable} from '@angular/core';
-import {Observable, Subject} from 'rxjs';
-import {filter} from 'rxjs/operators';
-import {Alert, AlertType} from "../models/alert";
+import {MatSnackBarRef} from "@angular/material/snack-bar";
 
 @Injectable({providedIn: 'root'})
 export class AlertService {
-  private subject = new Subject<Alert>();
-  private defaultAlert: Alert = {
-    autoClose: false, fade: false, id: "default-alert", keepAfterRouteChange: false, message: "", type: AlertType.Info
+  private alerts: Alert[] = []
+
+  addSnackbar = <T extends MatSnackBarRef<E>, E>(snackbar: T, id: number | string): T => this.add(snackbar, id, snackbar.dismiss)
+
+  close(id: number | string): boolean {
+    const alerts = this.alerts.filter(it => it.id === id)
+    if (alerts.length == 0) return false
+
+    alerts.forEach(it => it.close())
+    this.alerts = this.alerts.filter(it => it.id !== id)
+    return true
   }
 
-  // enable subscribing to alerts observable
-  onAlert(id = this.defaultAlert.id): Observable<Alert> {
-    return this.subject.asObservable().pipe(filter(x => x && x.id === id));
-  }
-
-  // convenience methods
-  success(message: string, options?: Partial<Omit<Alert, 'message' | 'type'>>) {
-    this.alert({...this.defaultAlert, ...options, type: AlertType.Success, message})
-  }
-
-  error(message: string, options?: Partial<Omit<Alert, 'message' | 'type'>>) {
-    this.alert({...this.defaultAlert, ...options, type: AlertType.Error, message})
-  }
-
-  info(message: string, options?: Partial<Omit<Alert, 'message' | 'type'>>) {
-    this.alert({...this.defaultAlert, ...options, type: AlertType.Info, message})
-  }
-
-  warn(message: string, options?: Partial<Omit<Alert, 'message' | 'type'>>) {
-    this.alert({...this.defaultAlert, ...options, type: AlertType.Warning, message})
-  }
-
-  // main alert method
-  alert = (alert: Alert) => this.subject.next(alert);
-
-  // clear alerts
   clear() {
-    this.subject.next(this.defaultAlert);
+    this.alerts.forEach(it => it.close())
+    this.alerts = []
   }
+
+  private add<T>(alert: T, id: number | string, close: () => void): T {
+    this.getAlerts(id).forEach(it => this.close(it.id))
+
+    this.alerts.push({id, close})
+    return alert
+  }
+
+  private getAlerts = (id: number | string): Alert[] => this.alerts.filter(it => it.id === id)
 }
+
+type Alert = { id: number | string, close: () => void }

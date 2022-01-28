@@ -1,12 +1,26 @@
-<nav mat-tab-nav-bar>
-  <a mat-tab-link *ngFor="let link of links"
-     (click)="activeLink = link"
-     [routerLink]="link"
-     [active]="activeLink == link"> {{link}} </a>
+<nav mat-tab-nav-bar *ngIf="user">
+  <mat-toolbar>
+    <span class="example-spacer"></span>
+    <a mat-tab-link *ngFor="let link of links"
+       [routerLink]="link.path"
+       routerLinkActive #rla="routerLinkActive"
+       [routerLinkActiveOptions]="{exact:true}"
+       [active]="rla.isActive">
+      {{link.label}}
+    </a>
+    <button mat-icon-button [matMenuTriggerFor]="menu">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Logout</span>
+      </button>
+    </mat-menu>
+  </mat-toolbar>
 </nav>
 
-<!-- main app container -->
+
 <div>
-  <alert></alert>
   <router-outlet></router-outlet>
 </div>

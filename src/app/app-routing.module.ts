@@ -1,13 +1,13 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {HomeComponent} from "./components/home/home/home.component";
 import {AuthGuard} from "./guards/auth.guard";
+import {AlertGuard} from "./guards/alert.guard";
 
 const routes: Routes = [
-  {path: '', component: HomeComponent, canActivate: [AuthGuard]},
-  {path: 'users', loadChildren: () => import('./components/users/users.module').then(m => m.UsersModule), canActivate: [AuthGuard]},
+  {path: '', redirectTo: 'measurements', pathMatch: 'full'},
   {path: 'account', loadChildren: () => import('./components/account/account/account.module').then(m => m.AccountModule)},
-
+  {path: 'measurements', loadChildren: () => import('./components/calculator/calculator.module').then(m => m.CalculatorModule), canActivate: [AuthGuard, AlertGuard]},
+//TODO AlertGuard everywhere
   {path: '**', redirectTo: ''}
 ];
 
