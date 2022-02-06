@@ -1,7 +1,6 @@
 version: '3.9'
 services:
-  frontend: # The name of the service
-    container_name: angularcontainer  # Container name
+  frontend:
     build: .
     networks:
       - nginx_network
