@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkartist_homepage=self.webpackChunkartist_homepage||[]).push([[360],{8658:(a,s,e)=>{e.r(s),e.d(s,{values:()=>u});const u={}}}]);
