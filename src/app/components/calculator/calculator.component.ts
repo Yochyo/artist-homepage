@@ -63,6 +63,10 @@ export class CalculatorComponent implements OnInit, OnDestroy {
 
   check() {
     const age = Number(this.form.value.age)
+    const gender = this.form.value.gender as 'male' | 'female'
+    const weight = Number(this.form.value.weight)
+    const height = Number(this.form.value.height)
+
     let year = Math.floor(age / 12)
     let month = age % 12
 
