@@ -4,7 +4,7 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {first} from 'rxjs/operators';
 import {UserService} from "../../../../services/user.service";
 import {User} from "../../../../models/user";
-import {Workbook} from "exceljs";
+//import {Workbook} from "exceljs";
 
 
 @Component({templateUrl: 'login.component.html', styleUrls: ['login.component.scss']})
@@ -45,17 +45,17 @@ export class LoginComponent implements OnInit {
   loadRegister = () => this.router.navigate(['/account/register'], {queryParams: {returnUrl: this.route.snapshot.queryParams['returnUrl'] || '/'}})
 
   exportUser = async () => {
-    const workbook: Workbook = new Workbook();
-    const worksheet = workbook.addWorksheet("My Users");
-    const buffer = await workbook.xlsx.writeBuffer()
-    const b = new Blob([new Uint8Array(buffer, 0, length)]);
-
-    const anchor: HTMLAnchorElement = document.getElementById("anchor") as HTMLAnchorElement
-    const url = window.URL.createObjectURL(b);
-    anchor.href = url;
-    anchor.download = `${Date.now().toString()}.xlsx`;
-    anchor.click()
-    window.URL.revokeObjectURL(url);
+    // const workbook: Workbook = new Workbook();
+    // const worksheet = workbook.addWorksheet("My Users");
+    // const buffer = await workbook.xlsx.writeBuffer()
+    // const b = new Blob([new Uint8Array(buffer, 0, length)]);
+    //
+    // const anchor: HTMLAnchorElement = document.getElementById("anchor") as HTMLAnchorElement
+    // const url = window.URL.createObjectURL(b);
+    // anchor.href = url;
+    // anchor.download = `${Date.now().toString()}.xlsx`;
+    // anchor.click()
+    // window.URL.revokeObjectURL(url);
 
     // const path = "./files";
     //  worksheet.columns = [{header: "S no.", key: "s_no", width: 10},
