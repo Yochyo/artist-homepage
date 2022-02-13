@@ -1,6 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {UserService} from "../../../services/user.service";
 import {Router} from "@angular/router";
+import {FormControl} from "@angular/forms";
 
 @Component({
   selector: 'app-account',
@@ -8,6 +9,9 @@ import {Router} from "@angular/router";
   styleUrls: ['./account.component.scss']
 })
 export class AccountComponent implements OnInit {
+  @Input() value: string = ''
+  form!: FormControl
+
 
   constructor(
     private userService: UserService,
@@ -19,6 +23,7 @@ export class AccountComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.form = new FormControl(this.value)
   }
 
 }

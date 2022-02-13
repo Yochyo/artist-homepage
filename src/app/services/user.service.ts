@@ -37,7 +37,7 @@ export class UserService {
     this.router.navigate(['/account/login']);
   }
 
-  register(user: Omit<User, '_id' | 'token'>) {
+  register(user: Omit<User, '_id'>) {
     return this.http.post<User>(`${environment.apiUrl}users`, user).pipe(
       tap(user => this.setUser(user))
     );

@@ -1,10 +1,15 @@
 <div [formGroup]="$any(form)" style="padding: 64px;display: flex; justify-content: center; align-items: center">
   <div style="width: 70%;display: flex; flex-direction: column">
-    <mat-radio-group aria-label="Gender" [formControl]="$any(form.controls.gender)">
+    <mat-radio-group style="padding-bottom: 16px" aria-label="Gender" [formControl]="$any(form.controls.gender)">
       <mat-radio-button value="male">male</mat-radio-button>
       <mat-radio-button value="female">female</mat-radio-button>
     </mat-radio-group>
-    <br>
+
+    <mat-form-field appearance="legacy">
+      <mat-label>Patient name</mat-label>
+      <input matInput placeholder="Patient name" type="text" [formControl]="$any(form.controls.patientName)">
+    </mat-form-field>
+
     <mat-form-field appearance="legacy">
       <mat-label>Age (months)</mat-label>
       <input matInput placeholder="Age (months)" type="number" [formControl]="$any(form.controls.age)">
@@ -18,8 +23,27 @@
       <input matInput placeholder="Height (cm)" type="number" [formControl]="$any(form.controls.height)">
     </mat-form-field>
 
-    <button mat-flat-button color="primary" (click)="check()" [disabled]="!form.valid">Login</button>
+    <button mat-flat-button color="primary" (click)="submit()" [disabled]="!form.valid">Calculate</button>
 
-    <h3>{{result + ""}}</h3>
+    <br>
+    <div style="padding-top: 32px; justify-content: center; align-items: center; width: 100%">
+        <mat-progress-bar mode="indeterminate" *ngIf="uploading == true" style="width: 100%"></mat-progress-bar>
+
+      <mat-card *ngIf="uploading == false">
+        <table style="width: 20%" mat-table [dataSource]="resultTable">
+          <ng-container matColumnDef="unit">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let element"> {{element.unit}} </td>
+          </ng-container>
+          <ng-container matColumnDef="state">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let element"> {{element.state}}</td>
+          </ng-container>
+          <tr style="display: none" mat-header-row *matHeaderRowDef="['unit','state']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['unit','state'];"></tr>
+        </table>
+      </mat-card>
+    </div>
+
   </div>
 </div>

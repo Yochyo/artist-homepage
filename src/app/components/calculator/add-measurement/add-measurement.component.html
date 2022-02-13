@@ -1,8 +1,8 @@
 <div [formGroup]="$any(form)" style="padding: 64px;display: flex; justify-content: center; align-items: center">
   <div style="width: 70%;display: flex; flex-direction: column">
     <mat-form-field appearance="legacy">
-      <mat-label>Age (months)</mat-label>
-      <input matInput placeholder="Age (months)" type="number" [formControl]="$any(form.controls.age)">
+      <mat-label>Patient name</mat-label>
+      <input matInput placeholder="Patient name" type="text" [formControl]="$any(form.controls.patientName)">
     </mat-form-field>
     <mat-form-field appearance="legacy">
       <mat-label>Weight (kg)</mat-label>

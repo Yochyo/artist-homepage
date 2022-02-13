@@ -1,12 +1,15 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {webSocket, WebSocketSubject} from "rxjs/webSocket";
-import {Measurement} from "../../models/measurement";
+import {Gender, Measurement} from "../../models/measurement";
 import {MatSnackBar, MatSnackBarRef} from "@angular/material/snack-bar";
 import {NewMeasurementPopupComponent} from "./new-measurement-popup/new-measurement-popup.component";
 import {environment} from "../../../environments/environment";
 import {UserService} from "../../services/user.service";
 import {AlertService} from "../../services/alert.service";
+import {HealthService} from "../../services/health.service";
+import {MeasurementRepositoryService} from "../../api/measurement-repository.service";
+import {of, switchAll, switchMap, tap} from "rxjs";
 
 @Component({
   selector: 'app-calculator',
@@ -17,16 +20,20 @@ export class CalculatorComponent implements OnInit, OnDestroy {
   static readonly SNACKBAR_ID = "CalculatorComponent"
 
   form = new FormGroup({
-    gender: new FormControl('', Validators.required),
-    age: new FormControl('', Validators.required),
     weight: new FormControl('', Validators.required),
     height: new FormControl('', Validators.required),
-  }) as FormGroupTyped<{ gender: string, age: string, weight: string, height: string }>
-  result: string = ''
-  ws: WebSocketSubject<any> | undefined
 
+    patientName: new FormControl('', Validators.required),
+    gender: new FormControl('', Validators.required),
+    age: new FormControl('', Validators.required),
+  }) as FormGroupTyped<Omit<Measurement, '_id' | 'userId'>>
 
-  constructor(private snackBar: MatSnackBar, private userService: UserService, private alertService: AlertService) {
+  uploading?: boolean = undefined
+  resultTable: { unit: string, state: string }[] = []
+
+  timer?: NodeJS.Timeout
+
+  constructor(private healthService: HealthService, private measurementRepo: MeasurementRepositoryService, private snackBar: MatSnackBar, private userService: UserService, private alertService: AlertService) {
   }
 
   openSnackBar(next: Measurement) {
@@ -41,7 +48,7 @@ export class CalculatorComponent implements OnInit, OnDestroy {
         },
         onLoad: (_: MatSnackBarRef<NewMeasurementPopupComponent>) => {
           this.alertService.close(CalculatorComponent.SNACKBAR_ID)
-          this.patchMeasurement(next)
+          this.fillForm(next)
         },
       }
     }), CalculatorComponent.SNACKBAR_ID)
@@ -51,35 +58,62 @@ export class CalculatorComponent implements OnInit, OnDestroy {
   patchMeasurement = (next: Measurement) => this.form.patchValue({...next})
 
   ngOnInit(): void {
-    this.ws = webSocket<Measurement>(`ws://${environment.host}/measurements/${this.userService.userValue!!._id}/last/ws`)
-    setInterval(() => {
-      this.ws?.next("ping")
-      console.log("send ping")
-    }, 2000)
-    this.ws.subscribe({
-      next: next => this.openSnackBar(next)
-    })
+    // this.timer = setInterval(() => {
+    //   this.measurementRepo.last().pipe(
+    //     switchMap(last => {
+    //       this.measurementRepo.ack(last._id!!)
+    //       return of(last)
+    //     })
+    //   ).subscribe(it => {
+    //     this.openSnackBar(it)
+    //   })
+    // }, 2000)
   }
 
-  check() {
-    const age = Number(this.form.value.age)
-    const gender = this.form.value.gender as 'male' | 'female'
-    const weight = Number(this.form.value.weight)
-    const height = Number(this.form.value.height)
-
-    let year = Math.floor(age / 12)
-    let month = age % 12
-
-    let multipliedYear = year * 2
-    let multipliedMonth = month * 2
-
-    let yearConvertedFromMonths = multipliedYear + (Math.floor(multipliedMonth / 12))
-    let monthsAfterConversion = (multipliedMonth % 12)
-
-    this.result = `${yearConvertedFromMonths},${monthsAfterConversion}`
+  fillForm(measurement: Measurement) {
+    this.patchMeasurement(measurement)
   }
+
+  submit() {
+    let measurement = {...this.form.value, userId: this.userService.userValue!!._id}
+    console.log({measurement: measurement})
+    this.uploading = true
+    // this.measurementRepo.post(measurement).subscribe({
+    //   next: it => {
+    //     {
+    //       this.generateResult({...measurement, _id: it.result} as Required<Measurement>)
+    //       this.uploading = false
+    //     }
+    //   },
+    //   error: _ => this.uploading = undefined
+    // })
+    setTimeout(() => {
+      this.generateResult(measurement as Required<Measurement>)
+      this.uploading = false
+    }, 500)
+  }
+
+  generateResult(measurement: Required<Measurement>) {
+    let idealWeight = this.healthService.getIdealWeight(measurement.age, measurement.gender)
+    let idealHeight = this.healthService.getIdealHeight(measurement.age, measurement.gender)
+
+    this.resultTable = [
+      {
+        unit: "Weight",
+        state: measurement.weight < idealWeight.from ? "Too thin" : measurement.weight > idealWeight.to ? "Too fat" : "Healthy weight"
+      },
+      {
+        unit: "Height",
+        state: measurement.height < idealHeight.from ? "Too small" : measurement.height > idealHeight.to ? "Too big" : "healthy size"
+      }
+    ]
+    //TODO die größe angeben ist irgendwie komisch. Stattdesssen sollte die größe mit dem gewicht zusammenhängen
+  }
+
 
   ngOnDestroy(): void {
-    this.ws?.complete()
+    const timer = this.timer
+    if (timer != undefined)
+      clearInterval(timer)
   }
 }

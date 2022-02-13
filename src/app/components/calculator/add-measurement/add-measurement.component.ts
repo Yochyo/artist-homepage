@@ -6,6 +6,7 @@ import {Measurement} from "../../../models/measurement";
 import {UserService} from "../../../services/user.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {AlertService} from "../../../services/alert.service";
+import {MeasurementRepositoryService} from "../../../api/measurement-repository.service";
 
 @Component({
   selector: 'app-add-measurement',
@@ -15,12 +16,12 @@ import {AlertService} from "../../../services/alert.service";
 export class AddMeasurementComponent implements OnInit {
   static readonly SNACKBAR_ID = "AddMeasurementComponent"
   form = new FormGroup({
-    age: new FormControl('', Validators.required),
+    patientName: new FormControl('', Validators.required),
     weight: new FormControl('', Validators.required),
     height: new FormControl('', Validators.required),
-  })
+  }) as FormGroupTyped<Pick<Measurement, 'patientName' | 'weight' | 'height'>>
 
-  constructor(private http: HttpClient, private userService: UserService, private snackBar: MatSnackBar, private alertService: AlertService) {
+  constructor(private measurementRepo: MeasurementRepositoryService, private http: HttpClient, private userService: UserService, private snackBar: MatSnackBar, private alertService: AlertService) {
   }
 
   ngOnInit(): void {
@@ -28,21 +29,21 @@ export class AddMeasurementComponent implements OnInit {
 
   send() {
     const userId = this.userService.userValue!!._id
-    const body: Measurement = {
-      age: this.form.value.age,
-      weight: this.form.value.age,
-      height: this.form.value.age,
-      userId: userId
+    const measurement: Measurement = {
+      patientName: this.form.value.patientName,
+      weight: this.form.value.weight,
+      height: this.form.value.height,
+      userId
     }
-    this.http.post(`${environment.apiUrl}measurements/${userId}`, body).subscribe()
-    this.openSnackBar()
+    this.measurementRepo.post(measurement).subscribe(_ => this.openSnackBar())
+
   }
 
   openSnackBar() {
     const snack = this.alertService.addSnackbar(this.snackBar.open("Sent", "Close", {
       horizontalPosition: "center",
       verticalPosition: "top",
-      duration: 2000,
+      duration: 5000,
     }), AddMeasurementComponent.SNACKBAR_ID)
     snack.onAction().subscribe({
       next: _ => this.alertService.close(AddMeasurementComponent.SNACKBAR_ID)
